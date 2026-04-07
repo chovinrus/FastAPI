@@ -20,7 +20,7 @@ class TodoCreate(BaseModel):
     """
     model_config = ConfigDict(
         str_strip_whitespace=True,  # 自动去除字符串首尾空格
-        extra="forbid",              # 禁止额外字段
+        extra="forbid",  # 禁止额外字段
         json_schema_extra={
             "example": {
                 "task": "完成项目文档",
@@ -30,12 +30,12 @@ class TodoCreate(BaseModel):
             }
         }
     )
-    
+
     task: str = Field(..., min_length=1, max_length=200, description="任务内容")
     deadline: datetime = Field(..., description="截止时间")
     assigned_to: str = Field(..., min_length=2, max_length=50, description="负责人")
     priority: int = Field(default=3, ge=1, le=5, description="优先级 1-5")
-    
+
     @field_validator("task")
     @classmethod
     def task_cannot_be_blank(cls, v: str) -> str:
@@ -43,7 +43,7 @@ class TodoCreate(BaseModel):
         if not v.strip():
             raise ValueError("任务内容不能为空")
         return v
-    
+
     @model_validator(mode="after")
     def validate_deadline_must_be_future(self):
         """验证截止时间必须晚于当前时间"""
@@ -52,7 +52,7 @@ class TodoCreate(BaseModel):
             deadline_utc = self.deadline.replace(tzinfo=timezone.utc)
         else:
             deadline_utc = self.deadline.astimezone(timezone.utc)
-        
+
         if deadline_utc < datetime.now(timezone.utc):
             raise ValueError("截止时间不能早于当前时间")
         return self
@@ -79,13 +79,13 @@ class TodoUpdate(BaseModel):
             }
         }
     )
-    
+
     task: Optional[str] = Field(None, min_length=1, max_length=200)
     deadline: Optional[datetime] = None
     assigned_to: Optional[str] = Field(None, min_length=2, max_length=50)
     priority: Optional[int] = Field(None, ge=1, le=5)
     is_finished: Optional[bool] = None
-    
+
     @field_validator("task")
     @classmethod
     def task_cannot_be_blank(cls, v: Optional[str]) -> Optional[str]:
@@ -93,7 +93,7 @@ class TodoUpdate(BaseModel):
         if v is not None and not v.strip():
             raise ValueError("任务内容不能为空")
         return v
-    
+
     @model_validator(mode="after")
     def validate_deadline_if_provided(self):
         """如果提供了截止时间，验证必须晚于当前时间"""
@@ -102,7 +102,7 @@ class TodoUpdate(BaseModel):
                 deadline_utc = self.deadline.replace(tzinfo=timezone.utc)
             else:
                 deadline_utc = self.deadline.astimezone(timezone.utc)
-            
+
             if deadline_utc < datetime.now(timezone.utc):
                 raise ValueError("截止时间不能早于当前时间")
         return self
@@ -132,7 +132,7 @@ class Todo(BaseModel):
             }
         }
     )
-    
+
     id: str
     task: str
     deadline: datetime

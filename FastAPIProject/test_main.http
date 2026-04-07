@@ -1,2 +1,2 @@
-GET http://localhost:80/api/item?id=99
+GET http://localhost:8001/books
 Accept: application/json
